@@ -111,6 +111,13 @@ foreach my $sect(grep{/TEST/}$cfg->Sections()){
 	$TESTS{$tname}{control_set}="SET.".$TESTS{$tname}{control_set};
 }
 
+if((keys %TESTS)==0){
+	print STDERR "Cannot find any tests please check ini\n";
+	$ERROR_FLAG=1;
+}
+
+exit(1) if $ERROR_FLAG;
+
 
 ##############################################
 #END OF OPTION HANDLING AND INI FILE PARSING #
