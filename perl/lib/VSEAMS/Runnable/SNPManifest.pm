@@ -54,17 +54,11 @@ sub _skip_message{
 
 sub run_conditions{
 	my $self=shift;
-	my $odir = $self->outputs->{out_dir};
-	my $flag=0;
-	if(-e $odir){
-		$flag=1;
-		opendir (DIR, $odir) or die $!;
-		if(scalar(grep{/.*\.RData$/ && -f "$odir/$_"}readdir(DIR))>0){
-			$flag=1;
-		}
-		closedir(DIR);
+	if(-e $self->out_file){
+		return 1;
+	}else{
+		return 0;
 	}
-	return $flag;
 }
 
 1;
