@@ -22,7 +22,7 @@ mvs.perm<-function(sigma,n=1000){
 #sigma_cache_dir='/sigma/'                     
 #run_count='6'                                                          
 #chr_name='chr9'                                                       
-#out_dir='/perms/'           
+#out_dir='/perms/'       
 
 
 args<-commandArgs(TRUE)
@@ -42,23 +42,38 @@ pattern<-paste("^",chr_name,'_.*\\.RData',sep="")
 snp_files<-list.files(pattern=pattern,path=snp_dir,full.names=TRUE)
 ## do all files on the same chromosome together
 ## otherwise too many jobs and not so efficient
-lapply(seq_along(snp_files),function(i){
+dev.null<-lapply(seq_along(snp_files),function(i){
 	if(!file.exists(snp_files[i])) return()
 	snp_file<-snp_files[i]
+	message(snp_file)
 	load(snp_file)
+	if(nrow(snps)==0) return ()
 	#print(snps)
 	snps$start<-gsub(".*::","",rownames(snps))
 	## here we check to see if we have to use a downsampled version
-	## of sigma 
-	sample.sigma.file<-paste(sample_sigma_dir,basename(snp_file),sep="")
-	if(file.exists(sample.sigma.file)){
-		assign('sigma',get(load(sample.sigma.file)))
+	## of sigma
+	#rownames(sigma)<-sub("^.*::","",rownames(sigma))
+	sigma.file<-paste(sigma_cache_dir,basename(snp_file),sep="")
+	assign('sigma',get(load(sigma.file)))
+	rownames(sigma)<-sub("^.*::","",rownames(sigma))
+	#colnames(sigma)<-sub("^.*::","",colnames(sigma))
+	rindex<-which(rownames(sigma) %in% snps$start)
+	if(length(rindex)==1){
+		sname<-rownames(sigma)[rindex]
+		sigma<-as.matrix(sigma[rindex,rindex])
+		rownames(sigma)<-sname
 	}else{
-		##otherwise we use the cannonical one
-		sigma.file<-paste(sigma_cache_dir,basename(snp_file),sep="")
-		assign('sigma',get(load(sigma.file)))
+		sigma<-sigma[rindex,rindex]
 	}
-	## hopefully this is deprecated after testing
+	#sample.sigma.file<-paste(sample_sigma_dir,basename(snp_file),sep="")
+	#if(file.exists(sample.sigma.file)){
+	#	assign('sigma',get(load(sample.sigma.file)))
+	#}else{
+	#	##otherwise we use the cannonical one
+	#	sigma.file<-paste(sigma_cache_dir,basename(snp_file),sep="")
+	#	assign('sigma',get(load(sigma.file)))
+	#}
+	### hopefully this is deprecated after testing
 	if(!is.matrix(sigma))
 		sigma<-as.matrix(sigma)
 	perms<-mvs.perm(sigma,n_perms)

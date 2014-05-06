@@ -9,7 +9,7 @@ use constant _inputs_expected => {
 	out_dir => 'file',
 	in_dir => 'file',
 	sigma_cache_dir => 'file',
-	sample_sigma_dir => 'file',
+	#sample_sigma_dir => 'file',
 	n_perms => 'number',
 	test => 'boolean'
 };

@@ -9,5 +9,6 @@ use VSEAMS::Runnable::PruneSNPsCacheSigma;
 use VSEAMS::Runnable::CalcZ;
 use VSEAMS::Runnable::DownSampleSigma;
 use VSEAMS::Runnable::SNPManifest;
+use VSEAMS::Runnable::PrioritiseRegions;
 
 1;
