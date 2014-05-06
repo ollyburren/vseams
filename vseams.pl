@@ -22,7 +22,7 @@ perl vseams.pl --[i]ni_file {-[v]erbose -[h]elp)
 
 Variant set enrichment of GWAS statistics using multivariate sampling.
 
-	ini_file - path to a suitable inifile (see  http://github.com/ollyburren/ini/default.ini) for a template
+	ini_file - path to a suitable inifile (see  http://github.com/ollyburren/vseams/ini/default.ini) for a template
 	verbose - enable verbose output to STDERR - currently not implemented
 	help - print this message.
 
@@ -115,6 +115,7 @@ if((keys %TESTS)==0){
 	print STDERR "Cannot find any tests please check ini\n";
 	$ERROR_FLAG=1;
 }
+
 
 exit(1) if $ERROR_FLAG;
 
@@ -235,50 +236,69 @@ foreach my $ds(keys %DATASETS){
 		##########################################
 		## TODO MAKE UPPER LIMIT ON SNP_COUNT A PARAMETER
 		
-		$odir = "$dataset_dir_stub/ds_sigma/";
-		$STEP{$ds}{DownSampleSigma} = VSEAMS::Runnable::DownSampleSigma->new(
-			log_dir=>"$log_dir_stub/downsamplesigma/",
-			env_settings=>$RLIB_ENV,
-			macd_driver=>$DRIVER,
-			previous_step=>$STEP{$ds}{PruneSNPsCacheSigma},
-			debug_flag=>1,
-			chunk_size=>$CHUNK_SIZE,
-			inputs=>{
-				snp_dir=>$STEP{$ds}{PruneSNPsCacheSigma}->inputs->{out_dir},
-				downsample_file=>$STEP{$ds}{CreateSupport}->inputs->{out_dir}."downsample_files.tab",
-				max_snps_per_sigma_block=>$MAX_SNPS_PER_SIGMA_BLOCK,
-				sigma_cache_dir=>$STEP{$ds}{PruneSNPsCacheSigma}->inputs->{sigma_cache_dir},
-				test=>-1
-			},
-			outputs=>{
-				out_dir=>$odir
-			}
-			)->run_step();
-			
+		## $odir = "$dataset_dir_stub/ds_sigma/";
+		## $STEP{$ds}{DownSampleSigma} = VSEAMS::Runnable::DownSampleSigma->new(
+		## 	log_dir=>"$log_dir_stub/downsamplesigma/",
+		## 	env_settings=>$RLIB_ENV,
+		## 	macd_driver=>$DRIVER,
+		## 	previous_step=>$STEP{$ds}{PruneSNPsCacheSigma},
+		## 	debug_flag=>1,
+		## 	chunk_size=>$CHUNK_SIZE,
+		## 	inputs=>{
+		## 		snp_dir=>$STEP{$ds}{PruneSNPsCacheSigma}->inputs->{out_dir},
+		## 		downsample_file=>$STEP{$ds}{CreateSupport}->inputs->{out_dir}."downsample_files.tab",
+		## 		max_snps_per_sigma_block=>$MAX_SNPS_PER_SIGMA_BLOCK,
+		## 		sigma_cache_dir=>$STEP{$ds}{PruneSNPsCacheSigma}->inputs->{sigma_cache_dir},
+		## 		test=>-1
+		## 	},
+		## 	outputs=>{
+		## 		out_dir=>$odir
+		## 	}
+		## 	)->run_step();
+			                   
 		#############################	
 		## STEP4 CALCULATE MVS PERM##
 		#############################
 		
 		$odir = "$dataset_dir_stub/perms/";
 		
+		## $STEP{$ds}{CalcMVSPerm} = VSEAMS::Runnable::CalcMVSPerm->new(
+		## 	log_dir=>"$log_dir_stub/calcmvsperm/",
+		## 	env_settings=>$RLIB_ENV,
+		## 	macd_driver=>$DRIVER,
+		## 	previous_step=>$STEP{$ds}{PruneSNPsCacheSigma},
+		## 	debug_flag=>1,
+		## 	chunk_size=>$CHUNK_SIZE,
+		## 	inputs=>{
+		## 		in_dir=>$STEP{$ds}{PruneSNPsCacheSigma}->inputs->{out_dir},
+		## 		sigma_cache_dir=>$STEP{$ds}{PruneSNPsCacheSigma}->inputs->{sigma_cache_dir},
+		## 		sample_sigma_dir=>$STEP{$ds}{DownSampleSigma}->inputs->{out_dir},
+		## 		test=>-1,
+		## 		n_perms=>$N_PERMS
+		## 	},
+		## 	outputs=>{
+		## 		out_dir=>$odir
+		## 	}
+		## 	)->run_step();
+		
 		$STEP{$ds}{CalcMVSPerm} = VSEAMS::Runnable::CalcMVSPerm->new(
 			log_dir=>"$log_dir_stub/calcmvsperm/",
 			env_settings=>$RLIB_ENV,
 			macd_driver=>$DRIVER,
 			previous_step=>$STEP{$ds}{PruneSNPsCacheSigma},
-			debug_flag=>1,
+			debug_flag=>1,                             
 			chunk_size=>$CHUNK_SIZE,
 			inputs=>{
 				in_dir=>$STEP{$ds}{PruneSNPsCacheSigma}->inputs->{out_dir},
 				sigma_cache_dir=>$STEP{$ds}{PruneSNPsCacheSigma}->inputs->{sigma_cache_dir},
-				sample_sigma_dir=>$STEP{$ds}{DownSampleSigma}->inputs->{out_dir},
+				#sample_sigma_dir=>$STEP{$ds}{DownSampleSigma}->inputs->{out_dir},
 				test=>-1,
-				n_perms=>$N_PERMS
+				n_perms=>$N_PERMS                         
 			},
 			outputs=>{
 				out_dir=>$odir
 			}
-			)->run_step();
+		)->run_step();
 		
 		
 		## THESE STEPS ARE TEST SPECIFIC
